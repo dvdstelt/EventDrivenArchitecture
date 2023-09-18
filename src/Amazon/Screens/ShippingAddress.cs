@@ -49,7 +49,7 @@ public class ShippingAddress : Screen
     {
         var msg = new SubmitShippingAddress()
         {
-            OrderId = Guid.NewGuid(),
+            OrderId = this.Order.OrderId,
             Address = address
         };
 

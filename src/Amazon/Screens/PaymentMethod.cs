@@ -50,7 +50,7 @@ public class PaymentMethod : Screen
     {
         var msg = new SubmitPayment()
         {
-            OrderId = Guid.NewGuid(),
+            OrderId = this.Order.OrderId,
             PaymentMethod = paymentMethod
         };
 

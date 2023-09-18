@@ -27,7 +27,7 @@ public class Summary : Screen
         Console.WriteLine("Payment method: " + Order.PaymentMethod);
         Console.WriteLine("Press [ENTER] to finalize the order...");
     }
-    
+
     public override async Task<FollowUpAction> HandleKeyPress(ConsoleKey key)
     {
         switch (key)
@@ -48,7 +48,7 @@ public class Summary : Screen
     {
         var msg = new AcceptOrder()
         {
-            OrderId = Guid.NewGuid(),
+            OrderId = this.Order.OrderId,
             Quantity = Order.Quantity
         };
 

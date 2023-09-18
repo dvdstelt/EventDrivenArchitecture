@@ -61,7 +61,7 @@ public class ShippingMethod : Screen
     {
         var msg = new SubmitShippingMethod()
         {
-            OrderId = Guid.NewGuid(),
+            OrderId = this.Order.OrderId,
             ShippingMethod = shippingMethod
         };
 
