@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Finance.Commands;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared.NServiceBus;
 
@@ -21,7 +22,9 @@ internal static class Program
             .ConfigureLogging(logging => { logging.AddConsole(); })
             .UseNServiceBus(ctx =>
             {
-                var endpointConfiguration = new EndpointConfiguration(Name).ApplyDefaultConfiguration();
+                var endpointConfiguration =
+                    new EndpointConfiguration(Name).ApplyDefaultConfiguration(r =>
+                        r.RouteToEndpoint(typeof(ExecutePayment), "Finance"));
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
                 return endpointConfiguration;

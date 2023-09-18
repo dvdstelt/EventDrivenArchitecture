@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Amazon.Screens;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shared.Commands;
 using Shared.NServiceBus;
 
 namespace Amazon;
@@ -22,13 +24,28 @@ internal static class Program
             .ConfigureLogging(logging => { logging.AddConsole(); })
             .UseNServiceBus(ctx =>
             {
-                var endpointConfiguration = new EndpointConfiguration(Name).ApplyDefaultConfiguration();
+                var endpointConfiguration =
+                    new EndpointConfiguration(Name).ApplyDefaultConfiguration(s =>
+                    {
+                        s.RouteToEndpoint(typeof(AcceptOrder), "Sales");
+                        s.RouteToEndpoint(typeof(SubmitPayment), "Finance");
+                        s.RouteToEndpoint(typeof(SubmitShippingAddress), "Shipping");
+                        s.RouteToEndpoint(typeof(SubmitShippingMethod), "Shipping");
+                    });
                 endpointConfiguration.SendOnly();
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
                 return endpointConfiguration;
             })
-            .ConfigureServices(services => { services.AddHostedService<AmazonConsole>(); });
+            .ConfigureServices(services =>
+            {
+                services.AddHostedService<AmazonConsole>();
+                services.AddSingleton<Screen, ShoppingCart>();
+                services.AddSingleton<Screen, ShippingAddress>();
+                services.AddSingleton<Screen, ShippingMethod>();
+                services.AddSingleton<Screen, PaymentMethod>();
+                services.AddSingleton<Screen, Summary>();
+            });
     }
 
     static async Task OnCriticalError(ICriticalErrorContext context, CancellationToken cancellationToken)

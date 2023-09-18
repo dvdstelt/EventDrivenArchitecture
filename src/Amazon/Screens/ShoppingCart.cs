@@ -5,8 +5,6 @@ namespace Amazon.Screens;
 public class ShoppingCart : Screen
 {
     readonly IMessageSession messageSession;
-    int quantity = 1;
-    decimal price = 42;
 
     public ShoppingCart(IMessageSession messageSession)
     {
@@ -20,46 +18,37 @@ public class ShoppingCart : Screen
         Console.WriteLine("# Shopping cart           #");
         Console.WriteLine("###########################\n\n");
         Console.WriteLine("Title:                                               Price:      Quantity");
-        Console.WriteLine("Patterns of Enterprise Application Architecture      $42.00" + quantity.ToString().PadLeft(14));
+        Console.WriteLine("Patterns of Enterprise Application Architecture      $42.00" +
+                          Order.Quantity.ToString().PadLeft(14));
         Console.WriteLine("-------------------------------------------------------------------------");
-        var totalPrice = "$" + (price * quantity).ToString();
+        var totalPrice = "$" + (Order.Price * Order.Quantity).ToString();
         Console.WriteLine("                                                     Total:" + totalPrice.PadLeft(14));
         Console.WriteLine("Press + or - to increase/decrease quantity");
         Console.WriteLine("Press [ENTER] to continue...");
     }
 
 
-    public override async Task<FollowUpAction> HandleKeyPress(ConsoleKey key)
+    public override Task<FollowUpAction> HandleKeyPress(ConsoleKey key)
     {
         switch (key)
         {
             case ConsoleKey.Enter:
-                await SendMessage(quantity);
-                return FollowUpAction.ScreenIsDone;
-                break;
+                // We don't do anything here yet, until the summary screen
+                return Task.FromResult(FollowUpAction.ScreenIsDone);
             case ConsoleKey.OemPlus:
-                if (quantity < 10) quantity++;
+                if (Order.Quantity < 10) Order.Quantity++;
                 Display();
                 break;
             case ConsoleKey.OemMinus:
-                if (quantity > 1) quantity--;
+                if (Order.Quantity > 1) Order.Quantity--;
                 Display();
                 break;
             case ConsoleKey.Delete:
-                return FollowUpAction.Exit;
+                return Task.FromResult(FollowUpAction.Exit);
         }
 
-        return FollowUpAction.WaitForNewKeypress;
+        return Task.FromResult(FollowUpAction.WaitForNewKeypress);
     }
 
-    async Task SendMessage(int quanity)
-    {
-        var msg = new CreateOrder()
-        {
-            OrderId = Guid.NewGuid(),
-            Quantity = quanity
-        };
-
-        await messageSession.Send(msg);
-    }
+    public override int Sequence => 1;
 }

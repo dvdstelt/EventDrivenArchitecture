@@ -1,5 +1,6 @@
 ﻿using System.Net.Security;
 using Amazon.Screens;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Amazon;
@@ -7,24 +8,32 @@ namespace Amazon;
 public class AmazonConsole : BackgroundService
 {
     readonly IHostApplicationLifetime hostApplicationLifetime;
+    private readonly IServiceProvider _serviceProvider;
 
     Screen currentScreen;
-    List<Screen> screens;
+    IEnumerable<Screen> screens;
 
-    public AmazonConsole(IHostApplicationLifetime hostApplicationLifetime)
+    public AmazonConsole(IHostApplicationLifetime hostApplicationLifetime, IServiceProvider serviceProvider)
     {
         this.hostApplicationLifetime = hostApplicationLifetime;
-        currentScreen = new ShoppingCart();
-        screens = new List<Screen>() { currentScreen, new ShippingAddress() };
+        _serviceProvider = serviceProvider;
+
+        screens = serviceProvider.GetServices<Screen>();
+        currentScreen = screens.Aggregate((x, y) => x.Sequence < y.Sequence ? x : y);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
+            // TODO: Fix that we don't move this object around through all screens
+            var order = new Order();
+            order.OrderId = Guid.NewGuid();
+            
             Console.WriteLine("----------------------------------");
             Console.WriteLine("- Welcome to Amazon!             -");
             Console.WriteLine("----------------------------------\n");
+            currentScreen.Order = order;
             currentScreen.Display();
 
             while (!stoppingToken.IsCancellationRequested)
@@ -32,14 +41,12 @@ public class AmazonConsole : BackgroundService
                 if (!Console.KeyAvailable) continue;
                 var userInput = Console.ReadKey(true);
 
-                var result = currentScreen.HandleKeyPress(userInput.Key).Result;
+                var result = await currentScreen.HandleKeyPress(userInput.Key);
 
                 if (result == FollowUpAction.ScreenIsDone)
                 {
-                    var nextScreenIndex = screens.IndexOf(currentScreen) + 1;
-                    if (nextScreenIndex >= screens.Count)
-                        throw new ApplicationException("There's no next screen available...");
-                    currentScreen = screens[nextScreenIndex];
+                    currentScreen = screens.OrderBy(s => s.Sequence).First(s => s.Sequence > currentScreen.Sequence);
+                    currentScreen.Order = order;
                     currentScreen.Display();
                 }
 
@@ -53,7 +60,6 @@ public class AmazonConsole : BackgroundService
             throw;
         }
 
-        //await base.StopAsync(stoppingToken);
         hostApplicationLifetime.StopApplication();
     }
 }

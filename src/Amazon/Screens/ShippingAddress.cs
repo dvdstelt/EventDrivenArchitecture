@@ -15,26 +15,27 @@ public class ShippingAddress : Screen
     {
         Console.Clear();
         Console.WriteLine("###########################");
-        Console.WriteLine("# Shopping cart           #");
+        Console.WriteLine("# Shipping address        #");
         Console.WriteLine("###########################\n");
         Console.WriteLine("Select address:\n");
         Console.WriteLine("[1] Dennis van der Stelt, Van Zandvlietplein 1, Rotterdam");
         Console.WriteLine("[2] Dennis van der Stelt, Parkkade 1, Rotterdam");
     }
 
-
     public override async Task<FollowUpAction> HandleKeyPress(ConsoleKey key)
     {
         switch (key)
         {
-            case ConsoleKey.Oem1:
-                await SendMessage(1);
+            case ConsoleKey.D1:
+            case ConsoleKey.NumPad1:
+                await SendMessage(Guid.Parse("5306098a-1958-4cc6-99ad-b5354d711887"));
+                Order.ShippingAddress = "Van Zandvlietplein 1, Rotterdam";
                 return FollowUpAction.ScreenIsDone;
-                break;
-            case ConsoleKey.Oem2:
-                await SendMessage(2);
+            case ConsoleKey.D2:
+            case ConsoleKey.NumPad2:
+                await SendMessage(Guid.Parse("4002f279-8030-492a-b54b-129838689b08"));
+                Order.ShippingAddress = "Parkkade 1, Rotterdam";
                 return FollowUpAction.ScreenIsDone;
-                break;
             case ConsoleKey.Delete:
                 return FollowUpAction.Exit;
         }
@@ -42,12 +43,14 @@ public class ShippingAddress : Screen
         return FollowUpAction.WaitForNewKeypress;
     }
 
-    async Task SendMessage(int address)
+    public override int Sequence => 2;
+
+    async Task SendMessage(Guid address)
     {
         var msg = new SubmitShippingAddress()
         {
             OrderId = Guid.NewGuid(),
-            Address = Guid.NewGuid()
+            Address = address
         };
 
         await messageSession.Send(msg);
