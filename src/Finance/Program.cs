@@ -24,7 +24,11 @@ internal static class Program
             {
                 var endpointConfiguration =
                     new EndpointConfiguration(Name).ApplyDefaultConfiguration(r =>
-                        r.RouteToEndpoint(typeof(ExecutePayment), "Finance"));
+                        r.RouteToEndpoint(typeof(ExecutePayment), "Amazon.Finance"));
+
+                endpointConfiguration.Conventions().DefiningCommandsAs(t =>
+                    t.Namespace != null && t.Namespace.EndsWith("Commands"));
+
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
 
                 return endpointConfiguration;

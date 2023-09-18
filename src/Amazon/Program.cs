@@ -27,10 +27,10 @@ internal static class Program
                 var endpointConfiguration =
                     new EndpointConfiguration(Name).ApplyDefaultConfiguration(s =>
                     {
-                        s.RouteToEndpoint(typeof(AcceptOrder), "Sales");
-                        s.RouteToEndpoint(typeof(SubmitPayment), "Finance");
-                        s.RouteToEndpoint(typeof(SubmitShippingAddress), "Shipping");
-                        s.RouteToEndpoint(typeof(SubmitShippingMethod), "Shipping");
+                        s.RouteToEndpoint(typeof(AcceptOrder), "Amazon.Sales");
+                        s.RouteToEndpoint(typeof(SubmitPayment), "Amazon.Finance");
+                        s.RouteToEndpoint(typeof(SubmitShippingAddress), "Amazon.Shipping");
+                        s.RouteToEndpoint(typeof(SubmitShippingMethod), "Amazon.Shipping");
                     });
                 endpointConfiguration.SendOnly();
                 endpointConfiguration.DefineCriticalErrorAction(OnCriticalError);
