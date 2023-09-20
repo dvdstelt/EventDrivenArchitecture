@@ -1,6 +1,4 @@
-﻿using Shared.Commands;
-
-var config = new EndpointConfiguration("Receiver");
+﻿var config = new EndpointConfiguration("Receiver");
 config.UseTransport(new LearningTransport());
 
 var endpoint = await Endpoint.Start(config);

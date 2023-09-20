@@ -1,26 +1,10 @@
-﻿using Shared.Commands;
-
-var config = new EndpointConfiguration("Sender");
-var routing = config.UseTransport(new LearningTransport());
-routing.RouteToEndpoint(typeof(SubmitCustomerInformation), "Receiver");
-
-var endpoint = await Endpoint.Start(config);
-
-
-Console.WriteLine("Press a key to stop this endpoint");
+﻿Console.WriteLine("Enter the name of the city and press [ENTER]");
 
 while (true)
 {
     var result = Console.ReadLine();
-    
-    var msg = new SubmitCustomerInformation
-    {
-        CustomerId = Guid.NewGuid(),
-        Location = result
-    };
 
-    await endpoint.Send(msg);
-    Console.WriteLine("Send message");
+    // Send the message
+
+    Console.WriteLine("Message sent");
 }
-
-await endpoint.Stop();

@@ -1,4 +1,4 @@
-<component name="ProjectRunConfigurationManager">
+﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Everything" type="CompoundRunConfigurationType">
     <toRun name="Receiver" type="DotNetProject" />
     <toRun name="Sender" type="DotNetProject" />
