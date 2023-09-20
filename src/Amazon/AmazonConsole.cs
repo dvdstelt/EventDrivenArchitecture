@@ -8,7 +8,6 @@ namespace Amazon;
 public class AmazonConsole : BackgroundService
 {
     readonly IHostApplicationLifetime hostApplicationLifetime;
-    private readonly IServiceProvider _serviceProvider;
 
     Screen currentScreen;
     IEnumerable<Screen> screens;
@@ -16,7 +15,6 @@ public class AmazonConsole : BackgroundService
     public AmazonConsole(IHostApplicationLifetime hostApplicationLifetime, IServiceProvider serviceProvider)
     {
         this.hostApplicationLifetime = hostApplicationLifetime;
-        _serviceProvider = serviceProvider;
 
         screens = serviceProvider.GetServices<Screen>();
         currentScreen = screens.Aggregate((x, y) => x.Sequence < y.Sequence ? x : y);
@@ -29,7 +27,7 @@ public class AmazonConsole : BackgroundService
             // TODO: Fix that we don't move this object around through all screens
             var order = new Order();
             order.OrderId = Guid.NewGuid();
-            
+
             Console.WriteLine("----------------------------------");
             Console.WriteLine("- Welcome to Amazon!             -");
             Console.WriteLine("----------------------------------\n");
